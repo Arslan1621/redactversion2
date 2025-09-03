@@ -7,6 +7,7 @@ import PricingPage from './pages/PricingPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
+import DocsRedactionPage from './pages/DocsRedactionPage';
 import './styles/globals.css';
 
 const clerkPubKey = "pk_test_YnJhdmUtc2xvdGgtMTMuY2xlcmsuYWNjb3VudHMuZGV2JA";
@@ -22,6 +23,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/docs" element={<DocsRedactionPage />} />
           </Routes>
         </Layout>
       </Router>
