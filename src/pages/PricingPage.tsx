@@ -44,25 +44,43 @@ const PricingPage: React.FC = () => {
           </motion.div>
           
           <style jsx global>{`
-            /* Force 4-column layout as backup */
+            /* Force 4 columns in ONE ROW (horizontal) */
             .pricing-table-container > *,
+            .pricing-table-container,
             .cl-pricing-table,
-            [data-clerk-pricing-table] {
+            [data-clerk-pricing-table],
+            div[class*="pricing"] {
               display: grid !important;
               grid-template-columns: repeat(4, 1fr) !important;
+              grid-template-rows: 1fr !important;
               gap: 1.5rem !important;
+              width: 100% !important;
+              grid-auto-flow: column !important;
             }
             
+            /* Force each pricing card to take equal width */
+            .pricing-table-container .cl-pricing-card,
+            .pricing-table-container div[class*="card"],
+            .pricing-table-container > * > * {
+              width: 100% !important;
+              min-width: 250px !important;
+              grid-column: span 1 !important;
+            }
+            
+            /* Responsive: 2 columns on tablet */
             @media (max-width: 1024px) {
               .pricing-table-container > *,
+              .pricing-table-container,
               .cl-pricing-table,
               [data-clerk-pricing-table] {
                 grid-template-columns: repeat(2, 1fr) !important;
               }
             }
             
+            /* Responsive: 1 column on mobile */
             @media (max-width: 640px) {
               .pricing-table-container > *,
+              .pricing-table-container,
               .cl-pricing-table,
               [data-clerk-pricing-table] {
                 grid-template-columns: 1fr !important;
