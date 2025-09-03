@@ -34,7 +34,7 @@ const PricingPage: React.FC = () => {
       <section className="py-20 bg-white">
         <div className="container-custom">
           <motion.div
-            className="max-w-7xl mx-auto"
+            className="max-w-7xl mx-auto pricing-table-container"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -42,6 +42,26 @@ const PricingPage: React.FC = () => {
           >
             <PricingTable />
           </motion.div>
+          
+          <style jsx>{`
+            .pricing-table-container :global(.cl-pricing-table) {
+              display: grid !important;
+              grid-template-columns: repeat(4, 1fr) !important;
+              gap: 2rem !important;
+            }
+            
+            @media (max-width: 1024px) {
+              .pricing-table-container :global(.cl-pricing-table) {
+                grid-template-columns: repeat(2, 1fr) !important;
+              }
+            }
+            
+            @media (max-width: 640px) {
+              .pricing-table-container :global(.cl-pricing-table) {
+                grid-template-columns: 1fr !important;
+              }
+            }
+          `}</style>
 
           {/* FAQ Preview */}
           <motion.div
