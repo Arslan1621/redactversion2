@@ -44,22 +44,53 @@ const PricingPage: React.FC = () => {
           </motion.div>
           
           <style jsx>{`
+            /* Hide individual plan toggles and force 4-column layout */
             .pricing-table-container :global(.cl-pricing-table) {
               display: grid !important;
               grid-template-columns: repeat(4, 1fr) !important;
-              gap: 2rem !important;
+              gap: 1.5rem !important;
+              width: 100% !important;
             }
             
-            @media (max-width: 1024px) {
+            /* Hide the individual billing toggles on each plan */
+            .pricing-table-container :global(.cl-pricing-table .cl-billing-toggle),
+            .pricing-table-container :global([data-testid="billing-toggle"]),
+            .pricing-table-container :global(.billing-toggle) {
+              display: none !important;
+            }
+            
+            /* Ensure cards maintain equal height */
+            .pricing-table-container :global(.cl-pricing-card),
+            .pricing-table-container :global([data-testid="pricing-card"]) {
+              height: 100% !important;
+              min-height: 400px !important;
+            }
+            
+            /* Responsive layout */
+            @media (max-width: 1200px) {
               .pricing-table-container :global(.cl-pricing-table) {
                 grid-template-columns: repeat(2, 1fr) !important;
+                gap: 1rem !important;
               }
             }
             
-            @media (max-width: 640px) {
+            @media (max-width: 768px) {
               .pricing-table-container :global(.cl-pricing-table) {
                 grid-template-columns: 1fr !important;
               }
+            }
+            
+            /* Style the pricing cards to match your design */
+            .pricing-table-container :global(.cl-pricing-card) {
+              border-radius: 1.5rem !important;
+              padding: 2rem !important;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+              transition: all 0.3s ease !important;
+            }
+            
+            .pricing-table-container :global(.cl-pricing-card:hover) {
+              transform: translateY(-4px) !important;
+              box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
             }
           `}</style>
 
