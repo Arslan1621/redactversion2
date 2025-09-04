@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   FileText,
@@ -10,19 +9,36 @@ import {
   FileUp,
   X
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data - in real app this would come from your backend
+const mockUserData = {
+  currentPlan: 'Free',
+  redactionsUsed: 3,
+  redactionsLimit: 5,
+  documentsProcessed: 12,
+  savedHours: 24,
+};
 
-
-
+const mockRecentDocuments = [
+  { name: 'Legal_Contract_2025.pdf', status: 'Completed', date: '2 hours ago', redactions: 15 },
+  { name: 'HR_Report_Jan.docx', status: 'Processing', date: '1 day ago', redactions: 8 },
+  { name: 'Financial_Statement.xlsx', status: 'Completed', date: '2 days ago', redactions: 22 },
+];
 
 const DashboardPage: React.FC = () => {
   const { user } = useUser();
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [showRedactOptions, setShowRedactOptions] = useState(false);
 
+  const usagePercentage = (mockUserData.redactionsUsed / mockUserData.redactionsLimit) * 100;
+  const isNearLimit = usagePercentage >= 80;
 
-
-
+  const handleUpgrade = (planName: string) => {
+    // Redirect to PayPal for payment
+    const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=your-paypal-email&item_name=RedactPro ${planName} Plan&amount=${planName === 'Starter' ? '29' : planName === 'Professional' ? '79' : '199'}&currency_code=USD&return=https://yoursite.com/dashboard?upgrade=success`;
+    window.open(paypalUrl, '_blank');
+  };
 
   return (
     <div className="min-h-screen pt-16 bg-gray-50">
@@ -45,13 +61,67 @@ const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Quick Actions */}
+            {/* Usage Overview */}
             <motion.div
               className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Usage Overview</h2>
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  mockUserData.currentPlan === 'Free' ? 'bg-gray-100 text-gray-700' : 'gradient-bg text-white'
+                }`}>
+                  {mockUserData.currentPlan} Plan
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-6 bg-purple-50 rounded-xl">
+                  <div className="text-3xl font-bold text-purple-600 mb-2">
+                    {mockUserData.redactionsUsed}/{mockUserData.redactionsLimit}
+                  </div>
+                  <div className="text-sm text-gray-600">Redactions Used</div>
+                </div>
+                <div className="text-center p-6 bg-blue-50 rounded-xl">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                    {mockUserData.documentsProcessed}
+                  </div>
+                  <div className="text-sm text-gray-600">Documents Processed</div>
+                </div>
+                <div className="text-center p-6 bg-green-50 rounded-xl">
+                  <div className="text-3xl font-bold text-green-600 mb-2">
+                    {mockUserData.savedHours}h
+                  </div>
+                  <div className="text-sm text-gray-600">Time Saved</div>
+                </div>
+              </div>
+
+              {/* Usage Progress */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-700">Monthly Usage</span>
+                  <span className={`text-sm font-medium ${isNearLimit ? 'text-red-600' : 'text-gray-500'}`}>
+                    {usagePercentage.toFixed(0)}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className={`h-3 rounded-full transition-all duration-300 ${
+                      isNearLimit ? 'bg-red-500' : 'bg-gradient-to-r from-purple-500 to-blue-500'
+                    }`}
+                    style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                  ></div>
+                </div>
+                {isNearLimit && (
+                  <p className="text-sm text-red-600 mt-2">
+                    You're approaching your monthly limit. Consider upgrading for unlimited access.
+                  </p>
+                )}
+              </div>
+
+              {/* Quick Actions */}
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <button 
                   onClick={() => setShowRedactOptions(true)}
@@ -60,13 +130,15 @@ const DashboardPage: React.FC = () => {
                   <Upload className="w-5 h-5" />
                   <span>Redact Document</span>
                 </button>
-                <button 
-                  onClick={() => window.location.href = '/pricing'}
-                  className="btn-secondary flex items-center justify-center space-x-2 flex-1"
-                >
-                  <Crown className="w-5 h-5" />
-                  <span>Upgrade Plan</span>
-                </button>
+                {mockUserData.currentPlan === 'Free' && (
+                  <button 
+                    onClick={() => window.location.href = '/pricing'}
+                    className="btn-secondary flex items-center justify-center space-x-2 flex-1"
+                  >
+                    <Crown className="w-5 h-5" />
+                    <span>Upgrade Plan</span>
+                  </button>
+                )}
               </div>
             </motion.div>
 
@@ -261,9 +333,6 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
-
-
-
 
         {/* Redact Document Options Modal */}
         {showRedactOptions && (
