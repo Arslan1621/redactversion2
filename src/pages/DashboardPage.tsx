@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
-import {
-  FileText,
-  Upload,
-  Crown,
-  File,
-  FileUp,
-  X
+import { 
+  FileText, 
+  Upload, 
+  Crown, 
+  Activity, 
+  Download,
+  Clock,
+  Shield,
+  ArrowRight,
+  Plus,
+  TrendingUp,
+  Check
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 // Mock data - in real app this would come from your backend
 const mockUserData = {
@@ -29,7 +33,6 @@ const mockRecentDocuments = [
 const DashboardPage: React.FC = () => {
   const { user } = useUser();
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const [showRedactOptions, setShowRedactOptions] = useState(false);
 
   const usagePercentage = (mockUserData.redactionsUsed / mockUserData.redactionsLimit) * 100;
   const isNearLimit = usagePercentage >= 80;
@@ -123,16 +126,13 @@ const DashboardPage: React.FC = () => {
 
               {/* Quick Actions */}
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <button 
-                  onClick={() => setShowRedactOptions(true)}
-                  className="btn-primary flex items-center justify-center space-x-2 flex-1"
-                >
+                <button className="btn-primary flex items-center justify-center space-x-2 flex-1">
                   <Upload className="w-5 h-5" />
-                  <span>Redact Document</span>
+                  <span>Upload Document</span>
                 </button>
                 {mockUserData.currentPlan === 'Free' && (
                   <button 
-                    onClick={() => window.location.href = '/pricing'}
+                    onClick={() => setShowUpgrade(true)}
                     className="btn-secondary flex items-center justify-center space-x-2 flex-1"
                   >
                     <Crown className="w-5 h-5" />
@@ -203,7 +203,7 @@ const DashboardPage: React.FC = () => {
                     Upgrade to process unlimited documents with advanced features.
                   </p>
                   <button 
-                    onClick={() => window.location.href = '/pricing'}
+                    onClick={() => setShowUpgrade(true)}
                     className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
                   >
                     <span>Choose Plan</span>
@@ -333,40 +333,3 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
-
-        {/* Redact Document Options Modal */}
-        {showRedactOptions && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <motion.div
-              className="bg-white rounded-2xl p-8 max-w-md w-full"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Redact Document</h2>
-                <button onClick={() => setShowRedactOptions(false)} className="text-gray-500 hover:text-gray-700">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <button 
-                  onClick={() => navigate("/pdf")}
-                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  <FileText className="w-8 h-8 text-red-500" />
-                  <span className="text-lg font-medium text-gray-800">PDF Document</span>
-                </button>
-                <button 
-                  onClick={() => navigate("/docs")}
-                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                >
-                  <FileUp className="w-8 h-8 text-blue-500" />
-                  <span className="text-lg font-medium text-gray-800">Word Document</span>
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
