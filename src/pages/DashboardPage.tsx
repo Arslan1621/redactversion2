@@ -12,7 +12,9 @@ import {
   ArrowRight,
   Plus,
   TrendingUp,
-  Check
+  Check,
+  FileImage,
+  X
 } from 'lucide-react';
 
 // Mock data - in real app this would come from your backend
@@ -33,6 +35,7 @@ const mockRecentDocuments = [
 const DashboardPage: React.FC = () => {
   const { user } = useUser();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
 
   const usagePercentage = (mockUserData.redactionsUsed / mockUserData.redactionsLimit) * 100;
   const isNearLimit = usagePercentage >= 80;
@@ -41,6 +44,12 @@ const DashboardPage: React.FC = () => {
     // Redirect to PayPal for payment
     const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=your-paypal-email&item_name=RedactPro ${planName} Plan&amount=${planName === 'Starter' ? '29' : planName === 'Professional' ? '79' : '199'}&currency_code=USD&return=https://yoursite.com/dashboard?upgrade=success`;
     window.open(paypalUrl, '_blank');
+  };
+
+  const handleUploadOption = (type: 'pdf' | 'docs') => {
+    setShowUploadPopup(false);
+    // Navigate to respective pages
+    window.location.href = `/${type}`;
   };
 
   return (
@@ -126,7 +135,10 @@ const DashboardPage: React.FC = () => {
 
               {/* Quick Actions */}
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <button className="btn-primary flex items-center justify-center space-x-2 flex-1">
+                <button 
+                  onClick={() => setShowUploadPopup(true)}
+                  className="btn-primary flex items-center justify-center space-x-2 flex-1 hover:shadow-lg transition-all duration-200"
+                >
                   <Upload className="w-5 h-5" />
                   <span>Upload Document</span>
                 </button>
@@ -265,6 +277,87 @@ const DashboardPage: React.FC = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* Upload Options Popup */}
+        {showUploadPopup && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              className="bg-white rounded-2xl p-8 max-w-md w-full relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowUploadPopup(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Upload className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Document Type</h2>
+                <p className="text-gray-600">Select the type of document you want to upload and redact.</p>
+              </div>
+
+              <div className="space-y-4">
+                {/* PDF Option */}
+                <button
+                  onClick={() => handleUploadOption('pdf')}
+                  className="w-full p-6 border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-red-100 group-hover:bg-red-200 rounded-lg flex items-center justify-center transition-colors">
+                      <FileImage className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">
+                        PDF Documents
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Upload and redact PDF files with advanced OCR
+                      </p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors ml-auto" />
+                  </div>
+                </button>
+
+                {/* Docs Option */}
+                <button
+                  onClick={() => handleUploadOption('docs')}
+                  className="w-full p-6 border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center transition-colors">
+                      <FileText className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">
+                        Word Documents
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Upload and redact DOC, DOCX, and text files
+                      </p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors ml-auto" />
+                  </div>
+                </button>
+              </div>
+
+              <div className="text-center mt-6">
+                <button
+                  onClick={() => setShowUploadPopup(false)}
+                  className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* Upgrade Modal */}
         {showUpgrade && (
