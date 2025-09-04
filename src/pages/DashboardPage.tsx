@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  FileText, 
-  Upload, 
-  Crown, 
-  File, 
+import {
+  FileText,
+  Upload,
+  Crown,
+  File,
   FileUp,
   X
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 // Mock data - in real app this would come from your backend
 
@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
 
 const DashboardPage: React.FC = () => {
   const { user } = useUser();
-  const navigate = useNavigate();
   const [showRedactOptions, setShowRedactOptions] = useState(false);
 
 
@@ -71,26 +70,200 @@ const DashboardPage: React.FC = () => {
               </div>
             </motion.div>
 
+            {/* Recent Documents */}
+            <motion.div
+              className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Recent Documents</h2>
+                <button className="text-purple-600 hover:text-purple-700 font-medium">
+                  View All
+                </button>
+              </div>
 
+              <div className="space-y-4">
+                {mockRecentDocuments.map((doc, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">{doc.name}</div>
+                        <div className="text-sm text-gray-600">{doc.redactions} redactions • {doc.date}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        doc.status === 'Completed' 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-yellow-100 text-yellow-700'
+                      }`}>
+                        {doc.status}
+                      </span>
+                      {doc.status === 'Completed' && (
+                        <Download className="w-5 h-5 text-gray-400 hover:text-purple-600 cursor-pointer transition-colors" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-8">
+            {/* Upgrade Card */}
+            {mockUserData.currentPlan === 'Free' && (
+              <motion.div
+                className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+              >
+                <div className="text-center">
+                  <Crown className="w-12 h-12 text-yellow-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Unlock More Power</h3>
+                  <p className="text-purple-100 mb-6">
+                    Upgrade to process unlimited documents with advanced features.
+                  </p>
+                  <button 
+                    onClick={() => window.location.href = '/pricing'}
+                    className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <span>Choose Plan</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
+            {/* Quick Stats */}
+            <motion.div
+              className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-6">This Month</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Activity className="w-5 h-5 text-blue-500" />
+                    <span className="text-gray-600">Documents</span>
+                  </div>
+                  <span className="font-semibold text-gray-900">12</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-5 h-5 text-green-500" />
+                    <span className="text-gray-600">Avg. Time</span>
+                  </div>
+                  <span className="font-semibold text-gray-900">2.3s</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="w-5 h-5 text-purple-500" />
+                    <span className="text-gray-600">Accuracy</span>
+                  </div>
+                  <span className="font-semibold text-gray-900">99.8%</span>
+                </div>
+              </div>
+            </motion.div>
 
-
-
-
+            {/* Security Notice */}
+            <motion.div
+              className="bg-green-50 rounded-2xl p-6 border border-green-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+            >
+              <div className="flex items-start space-x-3">
+                <Shield className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-green-900 mb-2">Secure & Compliant</h4>
+                  <p className="text-sm text-green-700">
+                    All documents are processed with bank-level encryption and automatically deleted after processing.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
 
+        {/* Upgrade Modal */}
+        {showUpgrade && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              className="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Choose Your Plan</h2>
+                <p className="text-gray-600">Upgrade to unlock unlimited redactions and advanced features.</p>
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {['Starter', 'Professional', 'Enterprise'].map((plan) => (
+                  <div key={plan} className="border-2 border-gray-200 rounded-xl p-6 hover:border-purple-300 transition-colors">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{plan}</h3>
+                    <div className="text-3xl font-bold text-purple-600 mb-4">
+                      ${plan === 'Starter' ? '29' : plan === 'Professional' ? '79' : '199'}
+                      <span className="text-sm text-gray-500 font-normal">/month</span>
+                    </div>
+                    <ul className="space-y-2 mb-6 text-sm text-gray-600">
+                      <li className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>{plan === 'Starter' ? '100' : plan === 'Professional' ? '500' : 'Unlimited'} redactions/month</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Advanced AI detection</span>
+                      </li>
+                      <li className="flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>Priority support</span>
+                      </li>
+                    </ul>
+                    <button
+                      onClick={() => handleUpgrade(plan)}
+                      className={`w-full py-3 rounded-lg font-medium transition-colors ${
+                        plan === 'Professional'
+                          ? 'gradient-bg text-white hover:shadow-lg'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      Upgrade to {plan}
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-8">
+                <button
+                  onClick={() => setShowUpgrade(false)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  Maybe later
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default DashboardPage;
+
+
+
 
         {/* Redact Document Options Modal */}
         {showRedactOptions && (
@@ -127,3 +300,4 @@ export default DashboardPage;
             </motion.div>
           </div>
         )}
+
