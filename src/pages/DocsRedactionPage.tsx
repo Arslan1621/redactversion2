@@ -1,4 +1,19 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Upload, 
+  Download, 
+  Undo2, 
+  Trash2, 
+  Bot, 
+  FileText, 
+  Eye, 
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Info,
+  BarChart3
+} from 'lucide-react';
 
 // Declare mammoth as a global variable
 declare global {
@@ -307,408 +322,260 @@ ${tempDiv.innerHTML}
         documentViewerRef.current.innerHTML = currentContent;
       } else {
         documentViewerRef.current.innerHTML = `
-          <div style="border: 2px dashed #cbd5e0; border-radius: 15px; padding: 40px; text-align: center; background: #f8f9fa; transition: all 0.3s ease;">
-            <div style="font-size: 3rem; color: #cbd5e0; margin-bottom: 15px;">📄</div>
-            <h3>Upload a Word Document</h3>
-            <p>Select a .docx file to begin redaction</p>
+          <div class="border-2 border-dashed border-gray-300 rounded-2xl p-16 text-center bg-gray-50 transition-all duration-300 hover:border-purple-300 hover:bg-purple-50">
+            <div class="text-6xl text-gray-300 mb-6"><svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Upload a Word Document</h3>
+            <p class="text-gray-600">Select a .docx file to begin redaction</p>
           </div>
         `;
       }
     }
   }, [currentContent]);
 
-  return (
-    <div style={{ 
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      minHeight: "100vh",
-      color: "#333",
-      margin: 0,
-      padding: 0
-    }}>
-      <div style={{
-        maxWidth: "1400px",
-        margin: "0 auto",
-        padding: "20px"
-      }}>
-        {/* Header */}
-        <div style={{
-          background: "rgba(255, 255, 255, 0.95)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "20px",
-          padding: "30px",
-          marginBottom: "30px",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
-          textAlign: "center"
-        }}>
-          <h1 style={{
-            fontSize: "2.5rem",
-            color: "#4a5568",
-            marginBottom: "10px",
-            background: "linear-gradient(135deg, #667eea, #764ba2)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text"
-          }}>Document Redaction Tool</h1>
-          <p style={{
-            color: "#718096",
-            fontSize: "1.1rem",
-            margin: 0
-          }}>Securely redact sensitive information from Word documents</p>
-        </div>
+  const getStatusIcon = (type: string) => {
+    switch (type) {
+      case 'success': return <CheckCircle className="w-5 h-5" />;
+      case 'error': return <XCircle className="w-5 h-5" />;
+      case 'info': return <Info className="w-5 h-5" />;
+      default: return <AlertCircle className="w-5 h-5" />;
+    }
+  };
 
-        {/* Main Content */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 350px",
-          gap: "30px",
-          minHeight: "600px"
-        }}>
-          {/* Editor Panel */}
-          <div style={{
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(10px)",
-            borderRadius: "20px",
-            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
-            overflow: "hidden"
-          }}>
-            {/* Toolbar */}
-            <div style={{
-              background: "linear-gradient(135deg, #4a5568, #2d3748)",
-              padding: "20px",
-              borderBottom: "1px solid #e2e8f0"
-            }}>
-              {/* Status Message */}
-              {statusMessage && (
-                <div style={{
-                  padding: "15px",
-                  borderRadius: "10px",
-                  marginBottom: "20px",
-                  fontWeight: "500",
-                  ...(statusMessage.type === 'success' && {
-                    background: "#c6f6d5",
-                    color: "#22543d",
-                    border: "1px solid #9ae6b4"
-                  }),
-                  ...(statusMessage.type === 'info' && {
-                    background: "#bee3f8",
-                    color: "#2a4a6b",
-                    border: "1px solid #90cdf4"
-                  }),
-                  ...(statusMessage.type === 'error' && {
-                    background: "#fed7d7",
-                    color: "#742a2a",
-                    border: "1px solid #feb2b2"
-                  })
-                }}>
-                  {statusMessage.text}
+  const getStatusStyles = (type: string) => {
+    switch (type) {
+      case 'success': return 'bg-green-50 border-green-200 text-green-800';
+      case 'error': return 'bg-red-50 border-red-200 text-red-800';
+      case 'info': return 'bg-blue-50 border-blue-200 text-blue-800';
+      default: return 'bg-gray-50 border-gray-200 text-gray-800';
+    }
+  };
+
+  return (
+    <div className="min-h-screen pt-16 bg-gray-50">
+      <div className="container-custom py-12">
+        {/* Header */}
+        <motion.div
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Document Redaction Tool
+          </h1>
+          <p className="text-xl text-gray-600">
+            Securely redact sensitive information from Word documents
+          </p>
+        </motion.div>
+
+        {/* Status Message */}
+        {statusMessage && (
+          <motion.div
+            className={`mb-8 p-4 rounded-xl border flex items-center space-x-3 ${getStatusStyles(statusMessage.type)}`}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {getStatusIcon(statusMessage.type)}
+            <span className="font-medium">{statusMessage.text}</span>
+          </motion.div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Editor Panel */}
+          <div className="lg:col-span-3">
+            <motion.div
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              {/* Toolbar */}
+              <div className="bg-gray-900 p-6 border-b border-gray-200">
+                {/* First Toolbar Row */}
+                <div className="flex flex-wrap items-center gap-4 mb-4">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept=".docx"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={!mammothLoaded}
+                    className={`btn-primary flex items-center space-x-2 ${!mammothLoaded ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Upload className="w-5 h-5" />
+                    <span>{mammothLoaded ? 'Upload DOCX' : 'Loading...'}</span>
+                  </button>
+                  
+                  <button
+                    disabled={!selectedText}
+                    onClick={redactSelected}
+                    className={`flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium transition-all hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <Eye className="w-5 h-5" />
+                    <span>
+                      {selectedText ? `Redact "${selectedText.substring(0, 20)}${selectedText.length > 20 ? '...' : ''}"` : 'Redact Selected'}
+                    </span>
+                  </button>
+                  
+                  <button
+                    disabled={!currentContent}
+                    onClick={generateSuggestions}
+                    className="btn-secondary flex items-center space-x-2"
+                  >
+                    <Bot className="w-5 h-5" />
+                    <span>AI Suggestions</span>
+                  </button>
                 </div>
-              )}
-              
-              {/* First Toolbar Row */}
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "15px",
-                marginBottom: "15px",
-                flexWrap: "wrap"
-              }}>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept=".docx"
-                  onChange={handleFileUpload}
-                  style={{ display: "none" }}
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={!mammothLoaded}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    padding: "10px 20px",
-                    background: "linear-gradient(135deg, #667eea, #764ba2)",
-                    color: "white",
-                    borderRadius: "10px",
-                    border: "none",
-                    cursor: mammothLoaded ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    transition: "all 0.3s ease",
-                    fontSize: "14px",
-                    opacity: mammothLoaded ? 1 : 0.6
-                  }}
-                >
-                  📄 {mammothLoaded ? 'Upload DOCX File' : 'Loading...'}
-                </button>
                 
-                <button
-                  disabled={!selectedText}
-                  onClick={redactSelected}
-                  style={{
-                    padding: "10px 20px",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: selectedText ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    background: "linear-gradient(135deg, #f56565, #e53e3e)",
-                    color: "white",
-                    opacity: selectedText ? 1 : 0.6,
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  🖤 {selectedText ? `Redact "${selectedText.substring(0, 20)}${selectedText.length > 20 ? '...' : ''}"` : 'Redact Selected'}
-                </button>
-                
-                <button
-                  disabled={!currentContent}
-                  onClick={generateSuggestions}
-                  style={{
-                    padding: "10px 20px",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: currentContent ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    background: "linear-gradient(135deg, #ed8936, #dd6b20)",
-                    color: "white",
-                    opacity: currentContent ? 1 : 0.6,
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  🤖 AI Suggestions
-                </button>
+                {/* Second Toolbar Row */}
+                <div className="flex flex-wrap items-center gap-4">
+                  <button
+                    disabled={!currentContent}
+                    onClick={downloadDocx}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium transition-all hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Download className="w-5 h-5" />
+                    <span>Download DOCX</span>
+                  </button>
+                  
+                  <button
+                    disabled={redactionHistory.length === 0}
+                    onClick={undoRedaction}
+                    className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg font-medium transition-all hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Undo2 className="w-5 h-5" />
+                    <span>Undo</span>
+                  </button>
+                  
+                  <button
+                    disabled={redactionCount === 0}
+                    onClick={clearAllRedactions}
+                    className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg font-medium transition-all hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                    <span>Clear All</span>
+                  </button>
+                </div>
               </div>
               
-              {/* Second Toolbar Row */}
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "15px",
-                flexWrap: "wrap"
-              }}>
-                <button
-                  disabled={!currentContent}
-                  onClick={downloadDocx}
-                  style={{
-                    padding: "10px 20px",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: currentContent ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    background: "linear-gradient(135deg, #4299e1, #3182ce)",
-                    color: "white",
-                    opacity: currentContent ? 1 : 0.6,
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  📥 Download DOCX
-                </button>
-                
-                <button
-                  disabled={redactionHistory.length === 0}
-                  onClick={undoRedaction}
-                  style={{
-                    padding: "10px 20px",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: redactionHistory.length > 0 ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    background: "#718096",
-                    color: "white",
-                    opacity: redactionHistory.length > 0 ? 1 : 0.6,
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  ↶ Undo
-                </button>
-                
-                <button
-                  disabled={redactionCount === 0}
-                  onClick={clearAllRedactions}
-                  style={{
-                    padding: "10px 20px",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: redactionCount > 0 ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    background: "#718096",
-                    color: "white",
-                    opacity: redactionCount > 0 ? 1 : 0.6,
-                    transition: "all 0.3s ease"
-                  }}
-                >
-                  🗑️ Clear All
-                </button>
-              </div>
-            </div>
-            
-            {/* Document Viewer */}
-            <div
-              ref={documentViewerRef}
-              onMouseUp={handleTextSelection}
-              style={{
-                padding: "40px",
-                minHeight: "500px",
-                maxHeight: "600px",
-                overflowY: "auto",
-                background: "white",
-                lineHeight: "1.6",
-                fontSize: "14px",
-                cursor: "text"
-              }}
-            />
+              {/* Document Viewer */}
+              <div
+                ref={documentViewerRef}
+                onMouseUp={handleTextSelection}
+                className="p-8 min-h-[600px] max-h-[600px] overflow-y-auto bg-white leading-relaxed text-gray-900 cursor-text"
+                style={{ fontSize: '15px' }}
+              />
+            </motion.div>
           </div>
 
-          {/* Controls Panel */}
-          <div style={{
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(10px)",
-            borderRadius: "20px",
-            padding: "30px",
-            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
-            height: "fit-content"
-          }}>
-            <h3 style={{
-              color: "#4a5568",
-              marginBottom: "20px",
-              fontSize: "1.3rem"
-            }}>Redaction Controls</h3>
-            
+          {/* Sidebar */}
+          <div className="space-y-8">
             {/* Document Stats */}
-            <div style={{
-              marginBottom: "30px",
-              paddingBottom: "20px",
-              borderBottom: "1px solid #e2e8f0"
-            }}>
-              <h4 style={{
-                color: "#718096",
-                marginBottom: "15px",
-                fontSize: "1rem"
-              }}>📊 Document Stats</h4>
-              <div>
-                <p style={{ margin: "5px 0" }}><strong>Status:</strong> {currentContent ? 'Document loaded' : 'No document loaded'}</p>
-                <p style={{ margin: "5px 0" }}><strong>Redactions:</strong> {redactionCount}</p>
-                <p style={{ margin: "5px 0" }}><strong>File:</strong> {filename || 'None'}</p>
+            <motion.div
+              className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="flex items-center space-x-2 mb-6">
+                <BarChart3 className="w-6 h-6 text-purple-600" />
+                <h3 className="text-lg font-bold text-gray-900">Document Stats</h3>
               </div>
-            </div>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Status</span>
+                  <span className="font-semibold text-gray-900">
+                    {currentContent ? 'Document loaded' : 'No document'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Redactions</span>
+                  <span className="font-semibold text-purple-600">{redactionCount}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">File</span>
+                  <span className="font-semibold text-gray-900 truncate ml-2" title={filename || 'None'}>
+                    {filename || 'None'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
 
             {/* AI Suggestions */}
-            <div style={{
-              marginBottom: "30px",
-              paddingBottom: "20px",
-              borderBottom: "1px solid #e2e8f0"
-            }}>
-              <h4 style={{
-                color: "#718096",
-                marginBottom: "15px",
-                fontSize: "1rem"
-              }}>🎯 AI Suggestions</h4>
-              <div>
-                {suggestions.length === 0 ? (
-                  <p style={{ 
-                    color: '#718096', 
-                    fontStyle: 'italic',
-                    margin: 0
-                  }}>
-                    {currentContent ? 'No sensitive content detected.' : 'Load a document and click "AI Suggestions" to detect sensitive content automatically.'}
-                  </p>
-                ) : (
-                  <>
-                    <p style={{ 
-                      marginBottom: '15px', 
-                      color: '#4a5568',
-                      margin: "0 0 15px 0"
-                    }}>
-                      <strong>{suggestions.length}</strong> potential items found:
-                    </p>
-                    {suggestions.map((suggestion, index) => (
-                      <div key={index} style={{
-                        background: "#f8f9fa",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "10px",
-                        padding: "15px",
-                        marginBottom: "10px",
-                        transition: "all 0.3s ease"
-                      }}>
-                        <div style={{
-                          fontWeight: "600",
-                          color: "#4a5568",
-                          marginBottom: "5px"
-                        }}>"{suggestion.text}"</div>
-                        <div style={{
-                          fontSize: "12px",
-                          color: "#718096",
-                          marginBottom: "10px"
-                        }}>{suggestion.type}</div>
-                        <div style={{
-                          display: "flex",
-                          gap: "10px"
-                        }}>
-                          <button
-                            onClick={() => acceptSuggestion(index)}
-                            style={{
-                              padding: "5px 12px",
-                              fontSize: "12px",
-                              border: "none",
-                              borderRadius: "5px",
-                              cursor: "pointer",
-                              fontWeight: "600",
-                              background: "linear-gradient(135deg, #f56565, #e53e3e)",
-                              color: "white",
-                              transition: "all 0.3s ease"
-                            }}
-                          >
-                            Redact
-                          </button>
-                          <button
-                            onClick={() => rejectSuggestion(index)}
-                            style={{
-                              padding: "5px 12px",
-                              fontSize: "12px",
-                              border: "none",
-                              borderRadius: "5px",
-                              cursor: "pointer",
-                              fontWeight: "600",
-                              background: "#e2e8f0",
-                              color: "#4a5568",
-                              transition: "all 0.3s ease"
-                            }}
-                          >
-                            Ignore
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </>
-                )}
+            <motion.div
+              className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <div className="flex items-center space-x-2 mb-6">
+                <Bot className="w-6 h-6 text-orange-600" />
+                <h3 className="text-lg font-bold text-gray-900">AI Suggestions</h3>
               </div>
-            </div>
+              
+              {suggestions.length === 0 ? (
+                <p className="text-gray-500 text-sm">
+                  {currentContent ? 'No sensitive content detected.' : 'Load a document and click "AI Suggestions" to detect sensitive content automatically.'}
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm font-medium text-gray-900 mb-4">
+                    <strong>{suggestions.length}</strong> potential items found:
+                  </p>
+                  {suggestions.map((suggestion, index) => (
+                    <div key={index} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                      <div className="font-medium text-gray-900 mb-1">
+                        "{suggestion.text}"
+                      </div>
+                      <div className="text-xs text-gray-500 mb-3">
+                        {suggestion.type}
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => acceptSuggestion(index)}
+                          className="px-3 py-1 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          Redact
+                        </button>
+                        <button
+                          onClick={() => rejectSuggestion(index)}
+                          className="px-3 py-1 text-xs font-medium bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                          Ignore
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
 
             {/* Instructions */}
-            <div>
-              <h4 style={{
-                color: "#718096",
-                marginBottom: "15px",
-                fontSize: "1rem"
-              }}>ℹ️ Instructions</h4>
-              <ol style={{ 
-                color: '#718096', 
-                fontSize: '14px', 
-                lineHeight: '1.5',
-                paddingLeft: "20px",
-                margin: 0
-              }}>
-                <li>Upload a .docx file</li>
-                <li>Select text to redact manually</li>
-                <li>Use AI suggestions for automatic detection</li>
-                <li>Download your redacted document</li>
-              </ol>
-            </div>
+            <motion.div
+              className="bg-purple-50 rounded-2xl p-6 border border-purple-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <div className="flex items-start space-x-3">
+                <FileText className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-purple-900 mb-3">How to Use</h4>
+                  <ol className="text-sm text-purple-700 space-y-1">
+                    <li>1. Upload a .docx file</li>
+                    <li>2. Select text to redact manually</li>
+                    <li>3. Use AI suggestions for automatic detection</li>
+                    <li>4. Download your redacted document</li>
+                  </ol>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
